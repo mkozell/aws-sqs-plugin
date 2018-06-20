@@ -40,6 +40,7 @@ public class SQSChannelImpl implements SQSChannel {
     private final AmazonSQS      sqs;
     private final SQSQueue       queue;
     private final io.relution.jenkins.awssqs.net.RequestFactory factory;
+    private static final boolean DELETE_DISABLED = Boolean.getBoolean("plugin.aws.sqs.delete.disabled");
 
     /**
      * Number of requests that were sent (for logging)
@@ -87,7 +88,7 @@ public class SQSChannelImpl implements SQSChannel {
 
     @Override
     public void deleteMessages(final List<Message> messages) {
-        if (messages == null || messages.size() == 0) {
+        if (messages == null || messages.size() == 0 || DELETE_DISABLED) {
             return;
         }
 
