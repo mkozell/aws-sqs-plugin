@@ -58,7 +58,7 @@ public class SQSTriggerQueueTest {
     @Test
     public void shouldSetDefaults() {
         // Cannot mock or create an instance of final hudson.util.Secret, so null it is
-        final SQSTriggerQueue queue = new SQSTriggerQueue(null, "name", null, 0, 0);
+        final SQSTriggerQueue queue = new SQSTriggerQueue(null, "name", null, 0, 0, 0);
         queue.setFactory(this.sqsFactory);
 
         assertThat(queue.getUuid()).isNotEmpty();
@@ -76,7 +76,7 @@ public class SQSTriggerQueueTest {
 
     @Test
     public void shouldHaveNoExplicitEndpoint() {
-        final SQSTriggerQueue queue = new SQSTriggerQueue(null, "test-queue", null, 0, 0);
+        final SQSTriggerQueue queue = new SQSTriggerQueue(null, "test-queue", null, 0, 0, 0);
         queue.setFactory(this.sqsFactory);
 
         assertThat(queue.getUrl()).isEqualTo("mock://sqs.url");
@@ -91,6 +91,7 @@ public class SQSTriggerQueueTest {
                 null,
                 "https://sqs.us-east-1.amazonaws.com/929548749884/test-queue",
                 null,
+                0,
                 0,
                 0);
         queue.setFactory(this.sqsFactory);
@@ -107,6 +108,7 @@ public class SQSTriggerQueueTest {
                 null,
                 "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/test",
                 null,
+                0,
                 0,
                 0);
         queue.setFactory(this.sqsFactory);

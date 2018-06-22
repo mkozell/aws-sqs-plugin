@@ -43,7 +43,6 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
 
     private final AtomicBoolean          isRunning         = new AtomicBoolean();
     private volatile boolean             isShutDown;
-    private final static int             QUEUE_MAX = 2;
     private final Jenkins                jenkins= Jenkins.getInstance();
 
     public SQSQueueMonitorImpl(final ExecutorService executor, final io.relution.jenkins.awssqs.interfaces.SQSQueue queue, final SQSChannel channel) {
@@ -130,10 +129,10 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
                 return;
             }
 
-            int jobQueue = this.countBuildableItems();
-            if ( jobQueue > QUEUE_MAX) {
-                Log.info("Skipping %s since Jenkins queue of %d is greater than %d", this.channel, jobQueue, QUEUE_MAX);
-                Thread.sleep(10000);
+            final int jobQueue = this.countBuildableItems();
+            if (jobQueue > this.queue.getMaxNumberOfJobQueue()) {
+                Log.info("Skipping %s since Jenkins queue of %d is greater than %d", this.channel, jobQueue, this.queue.getMaxNumberOfJobQueue());
+                Thread.sleep(15000);
                 return;
             }
             this.processMessages();
