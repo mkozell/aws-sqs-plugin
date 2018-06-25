@@ -204,7 +204,7 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
             return;
         }
 
-        if (this.notifyListeners(messages)) {
+        if (this.notifyListeners(messages) && this.queue.isKeepQueueMessages() == false) {
             this.channel.deleteMessages(messages);
         }
     }

@@ -58,6 +58,11 @@
 				field="maxNumberOfJobQueue">
 				<f:textbox default="1000" />
 			</f:entry>
+			<f:entry
+				title="${%Keep SQS messages}"
+				field="keepQueueMessages">
+				<f:checkbox />
+			</f:entry>
 		</f:advanced>
 	</f:section>
 </j:jelly>

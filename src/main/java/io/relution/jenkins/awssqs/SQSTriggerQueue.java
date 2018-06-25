@@ -77,6 +77,7 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
     private final Integer waitTimeSeconds;
     private final Integer maxNumberOfMessages;
     private final Integer maxNumberOfJobQueue;
+    private final boolean keepQueueMessages;
 
     private String url;
     private final String name;
@@ -94,7 +95,8 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
             final String credentialsId,
             final Integer waitTimeSeconds,
             final Integer maxNumberOfMessages,
-            final Integer maxNumberOfJobQueue) {
+            final Integer maxNumberOfJobQueue,
+            final boolean keepQueueMessages) {
 
         this.uuid = StringUtils.isBlank(uuid) ? UUID.randomUUID().toString() : uuid;
         this.nameOrUrl = nameOrUrl;
@@ -144,6 +146,8 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
                 MAX_NUMBER_OF_JOB_QUEUE_MAX,
                 MAX_NUMBER_OF_JOB_QUEUE_DEFAULT);
 
+        this.keepQueueMessages = keepQueueMessages;
+
         final Matcher sqsUrlMatcher = SQS_URL_PATTERN.matcher(nameOrUrl);
 
         if (sqsUrlMatcher.matches()) {
@@ -169,7 +173,8 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
             final Secret secretKey,
             final Integer waitTimeSeconds,
             final Integer maxNumberOfMessages,
-            final Integer maxNumberOfJobQueue) {
+            final Integer maxNumberOfJobQueue,
+            final boolean keepQueueMessages) {
         this.uuid = StringUtils.isBlank(uuid) ? UUID.randomUUID().toString() : uuid;
         this.accessKey = accessKey;
         this.secretKey = secretKey;
@@ -193,6 +198,8 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
                 MAX_NUMBER_OF_JOB_QUEUE_MIN,
                 MAX_NUMBER_OF_JOB_QUEUE_MAX,
                 MAX_NUMBER_OF_JOB_QUEUE_DEFAULT);
+
+        this.keepQueueMessages = keepQueueMessages;
 
         final Matcher sqsUrlMatcher = SQS_URL_PATTERN.matcher(nameOrUrl);
 
@@ -260,6 +267,11 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
             return WAIT_TIME_SECONDS_DEFAULT;
         }
         return this.waitTimeSeconds;
+    }
+
+    @Override
+    public boolean isKeepQueueMessages() {
+        return this.keepQueueMessages;
     }
 
     @Override
@@ -492,7 +504,7 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
                 @QueryParameter final String nameOrUrl,
                 @QueryParameter final String credentialsId) throws IOException {
             try {
-                final SQSTriggerQueue queue = new SQSTriggerQueue(uuid, nameOrUrl, credentialsId, 0, 0, 0);
+                final SQSTriggerQueue queue = new SQSTriggerQueue(uuid, nameOrUrl, credentialsId, 0, 0, 0, false);
 
                 if (StringUtils.isBlank(queue.getName())) {
                     return FormValidation.warning("Name or URL of the queue must be set.");

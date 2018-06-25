@@ -1,10 +1,8 @@
 <div>
-The maximum number of buildable items in the build job queue before pausing the retrevial of SQS messages from the queue.
-Values can be from 0 (don't pull messages from SQS when there is a build job queue) to 100,000. Default is 1000. Pauses set to  
+The maximum number of buildable items in the build job queue before pausing the retrevial of SQS messages.
+Values can be from 0 (don't pull messages from SQS when there is a build job queue) to 100,000. Default is 1000. Pause set to  
 15 seconds.
 <p/>
-The goal is to prevent overloading a busy Jenkins master that has a build queue with additional work
-<p/>
-See hudson.model.BuildableItem for more details
+The goal is to prevent overloading a busy Jenkins master that has a build queue with additional work.
 <p/>
 </div>
