@@ -64,7 +64,7 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
     private static final int MAX_NUMBER_OF_MESSAGES_MAX = 10;
     
     private static final int MAX_NUMBER_OF_JOB_QUEUE_MIN = 0;
-    private static final int MAX_NUMBER_OF_JOB_QUEUE_MAX = 100000;    
+    private static final int MAX_NUMBER_OF_JOB_QUEUE_MAX = 100000;
     private static final int MAX_NUMBER_OF_JOB_QUEUE_DEFAULT = 1000;
 
     private final String uuid;
