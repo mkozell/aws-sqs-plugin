@@ -56,6 +56,18 @@ public interface SQSQueue extends AWSCredentials {
     int getWaitTimeSeconds();
 
     /**
+     * Returns the maximum number of buildable jobs allowed in the build queue.
+     * @return The maximum number of buildable jobs allowed in the build queue.
+     */
+    int getMaxNumberOfJobQueue();
+
+    /**
+     * Returns a value indicating whether SQS messages should be kept after retrieval.
+     * @return {@code true} if messages should be kept after retrieval; otherwise, {@code false}.
+     */
+    boolean isKeepQueueMessages();
+
+    /**
      * Returns the maximum number of messages that a request should request.
      * @return The maximum number of messages a receive message request should request from the
      * queue.

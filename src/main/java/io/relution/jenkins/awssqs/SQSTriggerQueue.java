@@ -62,6 +62,10 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
     private static final int MAX_NUMBER_OF_MESSAGES_DEFAULT = 10;
     private static final int MAX_NUMBER_OF_MESSAGES_MIN = 1;
     private static final int MAX_NUMBER_OF_MESSAGES_MAX = 10;
+    
+    private static final int MAX_NUMBER_OF_JOB_QUEUE_MIN = 0;
+    private static final int MAX_NUMBER_OF_JOB_QUEUE_MAX = 100000;
+    private static final int MAX_NUMBER_OF_JOB_QUEUE_DEFAULT = 1000;
 
     private final String uuid;
 
@@ -72,6 +76,8 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
 
     private final Integer waitTimeSeconds;
     private final Integer maxNumberOfMessages;
+    private final Integer maxNumberOfJobQueue;
+    private final boolean keepQueueMessages;
 
     private String url;
     private final String name;
@@ -88,7 +94,9 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
             final String nameOrUrl,
             final String credentialsId,
             final Integer waitTimeSeconds,
-            final Integer maxNumberOfMessages) {
+            final Integer maxNumberOfMessages,
+            final Integer maxNumberOfJobQueue,
+            final boolean keepQueueMessages) {
 
         this.uuid = StringUtils.isBlank(uuid) ? UUID.randomUUID().toString() : uuid;
         this.nameOrUrl = nameOrUrl;
@@ -131,6 +139,14 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
                 MAX_NUMBER_OF_MESSAGES_MIN,
                 MAX_NUMBER_OF_MESSAGES_MAX,
                 MAX_NUMBER_OF_MESSAGES_DEFAULT);
+        
+        this.maxNumberOfJobQueue = this.limit(
+                maxNumberOfJobQueue,
+                MAX_NUMBER_OF_JOB_QUEUE_MIN,
+                MAX_NUMBER_OF_JOB_QUEUE_MAX,
+                MAX_NUMBER_OF_JOB_QUEUE_DEFAULT);
+
+        this.keepQueueMessages = keepQueueMessages;
 
         final Matcher sqsUrlMatcher = SQS_URL_PATTERN.matcher(nameOrUrl);
 
@@ -156,7 +172,9 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
             final String accessKey,
             final Secret secretKey,
             final Integer waitTimeSeconds,
-            final Integer maxNumberOfMessages) {
+            final Integer maxNumberOfMessages,
+            final Integer maxNumberOfJobQueue,
+            final boolean keepQueueMessages) {
         this.uuid = StringUtils.isBlank(uuid) ? UUID.randomUUID().toString() : uuid;
         this.accessKey = accessKey;
         this.secretKey = secretKey;
@@ -174,6 +192,14 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
                 MAX_NUMBER_OF_MESSAGES_MIN,
                 MAX_NUMBER_OF_MESSAGES_MAX,
                 MAX_NUMBER_OF_MESSAGES_DEFAULT);
+
+        this.maxNumberOfJobQueue = this.limit(
+                maxNumberOfJobQueue,
+                MAX_NUMBER_OF_JOB_QUEUE_MIN,
+                MAX_NUMBER_OF_JOB_QUEUE_MAX,
+                MAX_NUMBER_OF_JOB_QUEUE_DEFAULT);
+
+        this.keepQueueMessages = keepQueueMessages;
 
         final Matcher sqsUrlMatcher = SQS_URL_PATTERN.matcher(nameOrUrl);
 
@@ -244,11 +270,24 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
     }
 
     @Override
+    public boolean isKeepQueueMessages() {
+        return this.keepQueueMessages;
+    }
+
+    @Override
     public int getMaxNumberOfMessages() {
         if (this.maxNumberOfMessages == null) {
             return MAX_NUMBER_OF_MESSAGES_DEFAULT;
         }
         return this.maxNumberOfMessages;
+    }
+
+    @Override
+    public int getMaxNumberOfJobQueue() {
+        if (this.maxNumberOfJobQueue == null) {
+            return MAX_NUMBER_OF_JOB_QUEUE_DEFAULT;
+        }
+        return this.maxNumberOfJobQueue;
     }
 
     @Override
@@ -452,12 +491,20 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
                     Messages.errorMaxNumberOfMessages());
         }
 
+        public FormValidation doCheckMaxNumberOfJobQueue(@QueryParameter final String value) {
+            return this.validateNumber(
+                    value,
+                    MAX_NUMBER_OF_JOB_QUEUE_MIN,
+                    MAX_NUMBER_OF_JOB_QUEUE_MAX,
+                    Messages.errorMaxNumberOfJobQueue());
+        }
+
         public FormValidation doValidate(
                 @QueryParameter final String uuid,
                 @QueryParameter final String nameOrUrl,
                 @QueryParameter final String credentialsId) throws IOException {
             try {
-                final SQSTriggerQueue queue = new SQSTriggerQueue(uuid, nameOrUrl, credentialsId, 0, 0);
+                final SQSTriggerQueue queue = new SQSTriggerQueue(uuid, nameOrUrl, credentialsId, 0, 0, 0, false);
 
                 if (StringUtils.isBlank(queue.getName())) {
                     return FormValidation.warning("Name or URL of the queue must be set.");
