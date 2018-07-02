@@ -185,17 +185,11 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
     }
 
     private boolean isQuietingDown() {
-        if (jenkins == null) { 
-            return false;
-        }
-        return jenkins.isQuietingDown();
+        return (jenkins != null ? jenkins.isQuietingDown() : false);
     }
 
     private int countBuildableItems() {
-        if (jenkins == null) { 
-            return 0;
-        }
-        return jenkins.getQueue().countBuildableItems();
+        return (jenkins != null ? jenkins.getQueue().countBuildableItems() : 0);
     }
 
     private void processMessages() {

@@ -284,10 +284,7 @@ public class SQSTriggerQueue extends AbstractDescribableImpl<SQSTriggerQueue> im
 
     @Override
     public int getMaxNumberOfJobQueue() {
-        if (this.maxNumberOfJobQueue == null) {
-            return MAX_NUMBER_OF_JOB_QUEUE_DEFAULT;
-        }
-        return this.maxNumberOfJobQueue;
+        return (this.maxNumberOfJobQueue != null ? this.maxNumberOfJobQueue : MAX_NUMBER_OF_JOB_QUEUE_DEFAULT);
     }
 
     @Override
