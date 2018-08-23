@@ -68,7 +68,7 @@ public class SQSQueueImplTest {
         final ReceiveMessageResult result = Mockito.mock(ReceiveMessageResult.class);
 
         Mockito.when(this.factory.createReceiveMessageRequest(this.queue)).thenReturn(request);
-        Mockito.when(this.sqs.receiveMessage(request)).thenReturn(result);
+        Mockito.when(this.sqs.receiveMessage(request.withMessageAttributeNames("All"))).thenReturn(result);
         Mockito.when(result.getMessages()).thenReturn(this.messages);
 
         final List<Message> messages = this.channel.getMessages();
