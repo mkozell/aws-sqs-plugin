@@ -195,8 +195,10 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements io.relution.jenkin
         Map<String, String> jobParams = new HashMap<>();
 
         // add job parameters from the message (N.B. won't work post Jenkins v2+) @see https://wiki.jenkins-ci.org/display/JENKINS/Plugins+affected+by+fix+for+SECURITY-170
-        for (Map.Entry<String, String> att : message.getAttributes().entrySet()) {
-            jobParams.put("sqs_" + att.getKey(), att.getValue());
+        Log.info("BEFORE FOR");
+	for (Map.Entry<String, String> att : message.getAttributes().entrySet()) {
+            Log.info("MESSAGE ATTRIBUTE key=" + att.getKey() + " value=" + att.getValue());
+	    jobParams.put("sqs_" + att.getKey(), att.getValue());
         }
         jobParams.put("sqs_body", message.getBody());
         jobParams.put("sqs_messageId", message.getMessageId());
