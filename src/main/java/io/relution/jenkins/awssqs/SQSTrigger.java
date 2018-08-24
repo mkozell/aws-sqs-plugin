@@ -17,6 +17,7 @@
 package io.relution.jenkins.awssqs;
 
 import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import hudson.DescriptorExtensionList;
@@ -195,10 +196,8 @@ public class SQSTrigger extends Trigger<Job<?, ?>> implements io.relution.jenkin
         Map<String, String> jobParams = new HashMap<>();
 
         // add job parameters from the message (N.B. won't work post Jenkins v2+) @see https://wiki.jenkins-ci.org/display/JENKINS/Plugins+affected+by+fix+for+SECURITY-170
-        for (Map.Entry<String, String> att : message.getAttributes().entrySet()) {
-            if (StringUtils.isNotBlank(att.getKey())) {
-                jobParams.put("sqs_" + att.getKey(), att.getValue());
-            }
+	    for (Map.Entry<String, MessageAttributeValue> att : message.getMessageAttributes().entrySet()) {
+	        jobParams.put("sqs_" + att.getKey(), att.getValue().getStringValue());
         }
         jobParams.put("sqs_body", message.getBody());
         jobParams.put("sqs_messageId", message.getMessageId());

@@ -1,0 +1,8 @@
+<div>
+By default messages will be deleted from SQS after they are retrieved. Enable this setting if you would like messages to not
+be removed from SQS after retrieval. Your job configuration will probably want to remove these messages or they will be 
+retrieved again after the visibility timeout passes. 
+<p/>
+The goal is to prevent messages from going unprocessed when something crashes before the Jenkins job completes.
+<p/>
+</div>

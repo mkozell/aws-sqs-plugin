@@ -17,6 +17,7 @@
 package io.relution.jenkins.awssqs.threading;
 
 import com.amazonaws.services.sqs.model.Message;
+import jenkins.model.Jenkins;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,7 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
 
     private final AtomicBoolean          isRunning         = new AtomicBoolean();
     private volatile boolean             isShutDown;
+    private final Jenkins                jenkins           = Jenkins.getInstance();
 
     public SQSQueueMonitorImpl(final ExecutorService executor, final io.relution.jenkins.awssqs.interfaces.SQSQueue queue, final SQSChannel channel) {
         io.relution.jenkins.awssqs.util.ThrowIf.isNull(executor, "executor");
@@ -120,8 +122,21 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
             }
 
             Log.fine("Start synchronous monitor for %s", this.channel);
-            this.processMessages();
 
+            if (this.isQuietingDown()) {
+                Log.info("Skipping %s since Jenkins is preparing for shutdown", this.channel);
+                Thread.sleep(15000);
+                return;
+            }
+
+            final int currentJobQueueSize = this.countBuildableItems();
+            final int maxJobQueueSize = this.queue.getMaxNumberOfJobQueue();
+            if (currentJobQueueSize > maxJobQueueSize) {
+                Log.info("Skipping %s - Jenkins build queue %d is greater than configured %d", this.channel, currentJobQueueSize, maxJobQueueSize);
+                Thread.sleep(15000);
+                return;
+            }
+            this.processMessages();
         } catch (final com.amazonaws.services.sqs.model.QueueDoesNotExistException e) {
             Log.warning("Queue %s does not exist, monitor stopped", this.channel);
             this.isShutDown = true;
@@ -169,6 +184,14 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
         }
     }
 
+    private boolean isQuietingDown() {
+        return (jenkins != null ? jenkins.isQuietingDown() : false);
+    }
+
+    private int countBuildableItems() {
+        return (jenkins != null ? jenkins.getQueue().countBuildableItems() : 0);
+    }
+
     private void processMessages() {
         final List<Message> messages = this.channel.getMessages();
 
@@ -176,7 +199,7 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
             return;
         }
 
-        if (this.notifyListeners(messages)) {
+        if (this.notifyListeners(messages) && this.queue.isKeepQueueMessages() == false) {
             this.channel.deleteMessages(messages);
         }
     }

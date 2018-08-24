@@ -62,7 +62,7 @@ public class SQSChannelImpl implements SQSChannel {
             this.logRequestCount();
 
             final ReceiveMessageRequest request = this.factory.createReceiveMessageRequest(this.queue);
-            final ReceiveMessageResult result = this.sqs.receiveMessage(request);
+            final ReceiveMessageResult result = this.sqs.receiveMessage(request.withMessageAttributeNames("All"));
 
             if (result == null) {
                 return Collections.emptyList();

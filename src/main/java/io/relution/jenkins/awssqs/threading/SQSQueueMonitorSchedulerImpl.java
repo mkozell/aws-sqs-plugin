@@ -161,6 +161,14 @@ public class SQSQueueMonitorSchedulerImpl implements SQSQueueMonitorScheduler {
                 return true;
             }
 
+            if (current.getMaxNumberOfJobQueue() != queue.getMaxNumberOfJobQueue()) {
+                return true;
+            }
+
+            if (current.isKeepQueueMessages() != queue.isKeepQueueMessages()) {
+                return true;
+            }
+
             if (current.getWaitTimeSeconds() != queue.getWaitTimeSeconds()) {
                 return true;
             }
