@@ -204,8 +204,8 @@ public class SQSQueueMonitorImpl implements SQSQueueMonitor {
         } else if (!messages.isEmpty() && this.queue.isKeepQueueMessages() == true) {
             try {
                 Thread.sleep(2000);
-            } catch(InterruptedException ex) {
-               Log.warning("Exception occurred %s while sleeping after message retrieval on %s", ex.toString(), this.channel);
+            } catch (InterruptedException ex) {
+               Log.warning("Exception %s occurred while sleeping after message retrieval on %s", ex.toString(), this.channel);
             }
         }
     }
